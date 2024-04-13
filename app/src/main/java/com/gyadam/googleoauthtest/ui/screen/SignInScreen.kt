@@ -26,7 +26,7 @@ fun SignInScreen(
     var email by remember { mutableStateOf("") }
     val focusRequester = remember { FocusRequester() }
 
-    Surface(color = MaterialTheme.colorScheme.primary) {
+    Surface(color = MaterialTheme.colorScheme.background) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -37,7 +37,7 @@ fun SignInScreen(
             Text(
                 text = "Sign In",
                 style = MaterialTheme.typography.titleLarge,
-                color = Color.Black
+                color = MaterialTheme.colorScheme.primary
             )
             Spacer(modifier = Modifier.height(16.dp))
             TextField(
