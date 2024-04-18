@@ -1,10 +1,13 @@
 package com.gyadam.googleoauthtest.ui.screen
 
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Divider
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -27,6 +30,14 @@ fun SignInScreen(
     var email by remember { mutableStateOf("") }
     val focusRequester = remember { FocusRequester() }
     val state = viewModel.state.collectAsState()
+
+    val oAuthLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult(),
+    ) {
+        viewModel.onEvent(SIgnInEvent.OnOAuthResult(it.resultCode, it.data))
+    }
+
+
     Surface(color = MaterialTheme.colorScheme.background) {
         Column(
             modifier = Modifier
@@ -36,20 +47,33 @@ fun SignInScreen(
             verticalArrangement = Arrangement.Center
         ) {
 
-                when {
-                    state.value.isLoading -> CircularProgressIndicator()
+            when {
+                state.value.isLoading -> CircularProgressIndicator()
 
-                    state.value.successFuls -> Text(
+                state.value.successFuls -> {
+                    Text(
                         text = "Successful !", style = MaterialTheme.typography.titleLarge,
                         color = MaterialTheme.colorScheme.primary
                     )
-
-                    state.value.notSupported -> Text(
-                        text = "Not supported ! ", style = MaterialTheme.typography.titleLarge,
-                        color = MaterialTheme.colorScheme.primary
-                    )
+                    oAuthLauncher.launch(state.value.resultIntent)
                 }
 
+                state.value.notSupported -> Text(
+                    text = "Not supported ! ", style = MaterialTheme.typography.titleLarge,
+                    color = MaterialTheme.colorScheme.error
+                )
+
+                else -> {
+                    Text(
+                        text = "Waiting for action", style = MaterialTheme.typography.titleLarge,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+
+                }
+            }
+            Spacer(modifier = Modifier.height(16.dp))
+            Divider()
+            Spacer(modifier = Modifier.height(16.dp))
             Text(
                 text = "Sign In",
                 style = MaterialTheme.typography.titleLarge,

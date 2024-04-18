@@ -1,5 +1,9 @@
 package com.gyadam.googleoauthtest.ui.screen
 
+import android.app.Activity
+import android.content.Intent
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.lifecycle.ViewModel
 import com.gyadam.googleoauthtest.data.oauthCore.OAuthConfigurationProvider
 import com.gyadam.googleoauthtest.domain.entity.AuthorizationIntentResult
@@ -18,6 +22,8 @@ class SignInViewModel @Inject constructor(
     private val repository: AuthorizationRepository,
     private val configurationFactory: OAuthConfigurationProvider,
 ) : ViewModel() {
+
+
     private val _state = MutableStateFlow(SignInState())
     val state: StateFlow<SignInState> = _state.asStateFlow()
     fun onEvent(event: SIgnInEvent) {
@@ -45,8 +51,12 @@ class SignInViewModel @Inject constructor(
                     }
 
                     is AuthorizationIntentResult.Success -> {
+                        println("RESULT INTENT : ${result.intent}")
+
+                        println("RESULT INTENT EXTRAS: ${result.intent.extras}")
                         _state.update {
                             it.copy(
+                                resultIntent = result.intent,
                                 notSupported = false,
                                 successFuls = true,
                                 isLoading = false
@@ -55,6 +65,18 @@ class SignInViewModel @Inject constructor(
                     }
                 }
             }
+
+            is SIgnInEvent.OnOAuthResult -> onOAuthResult(event.resultCode, event.data)
         }
+    }
+
+    private fun onOAuthResult(resultCode: Int, data: Intent?) {
+        /*if (resultCode == Activity.RESULT_OK && data != null) {
+            finishSignIn(data)
+        } else {
+            updateState { state ->
+                state.copy(error = Error.Canceled)
+            }
+        }*/
     }
 }
