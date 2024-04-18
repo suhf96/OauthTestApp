@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -25,7 +26,7 @@ fun SignInScreen(
 ) {
     var email by remember { mutableStateOf("") }
     val focusRequester = remember { FocusRequester() }
-
+    val state = viewModel.state.collectAsState()
     Surface(color = MaterialTheme.colorScheme.background) {
         Column(
             modifier = Modifier
@@ -34,6 +35,21 @@ fun SignInScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
+
+                when {
+                    state.value.isLoading -> CircularProgressIndicator()
+
+                    state.value.successFuls -> Text(
+                        text = "Successful !", style = MaterialTheme.typography.titleLarge,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+
+                    state.value.notSupported -> Text(
+                        text = "Not supported ! ", style = MaterialTheme.typography.titleLarge,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                }
+
             Text(
                 text = "Sign In",
                 style = MaterialTheme.typography.titleLarge,
@@ -62,6 +78,8 @@ fun SignInScreen(
             ) {
                 Text(text = "Sign In")
             }
+
+
         }
     }
 
